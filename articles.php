@@ -5,7 +5,13 @@ include_once("header.php");
 include_once("main.php");
 $count = 0;
 $listId=[];
-$query="select idArticle from article where idArticle in (select idArticle from ligne_commande where ligne_commande.idarticle =article.idArticle)";
+$query="SELECT idArticle FROM article
+        WHERE idArticle IN (SELECT idArticle 
+            FROM ligne_commande 
+            WHERE ligne_commande.idarticle =article.idArticle)
+        OR idArticle IN (SELECT idArticle 
+            FROM images 
+            WHERE images.idarticle = article.idArticle)";
 $pdostmt=$pdo->prepare($query);
 $pdostmt->execute();
 foreach($pdostmt->fetchAll(PDO::FETCH_NUM) as $tabValues){
