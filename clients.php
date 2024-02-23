@@ -28,7 +28,9 @@ foreach($pdostmt->fetchAll(PDO::FETCH_NUM) as $tabValues){
     </svg>
     </a>
 <?php 
-    $query="select * from client";
+    $query="SELECT * from client AS C , region_maroc AS R, province_maroc AS P WHERE
+     C.IdProvince = P.IdProvince and P.code_region= R.code_region
+       ";
     $pdostmt=$pdo->prepare($query);
     $pdostmt->execute();
   //  var_dump($pdostmt->fetchAll(PDO::FETCH_ASSOC));
@@ -38,7 +40,8 @@ foreach($pdostmt->fetchAll(PDO::FETCH_NUM) as $tabValues){
         <tr>
             <th>ID</th>
             <th>NOM</th>
-            <th>Ville</th>
+            <th>Région</th>
+            <th>Préfecture/Province</th>
             <th>NUM_TELE</th>
             <th>ACTION</th>
         </tr>
@@ -51,7 +54,8 @@ foreach($pdostmt->fetchAll(PDO::FETCH_NUM) as $tabValues){
           
             <td><?php echo $ligne["idClient"] ?></td>
             <td><?php echo $ligne["nom"] ;?></td>
-            <td><?php echo $ligne["ville"] ;?></td>
+            <td><?php echo $ligne["nom_region"] ;?></td>
+            <td><?php echo $ligne["nom_province"] ;?></td>
             <td><?php echo $ligne["num_tele"] ;?></td>
             <td>
                 <a href="modifierClient.php?id=<?php echo $ligne["idClient"] ?>" class="btn btn-success">
