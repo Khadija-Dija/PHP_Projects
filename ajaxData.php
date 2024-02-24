@@ -1,5 +1,6 @@
 <?php 
-include_once("main.php");
+  include_once("connexion.php");
+  $pdo=new connect();
 if(!empty($_POST["code_region"])){
     
     $query="SELECT * FROM province_maroc WHERE code_region = :code_reg ORDER BY nom_province ASC";
@@ -10,8 +11,29 @@ if(!empty($_POST["code_region"])){
     echo "<option value='" . $row["idProvince"] . "'>" . $row["nom_province"] . "</option>";
     endwhile;
     $pdostmt->closeCursor();
-}
-else{
-    echo "code region vide";
+};
+//verifier si les champs non null
+if(!empty($_POST["inputnom"])&&!empty($_POST["inputville"])&&!empty($_POST["inputtel"])){
+    // prévenir les attaques par injection SQL: on utilise les paramètres nommés(nom,ville,telephone) dans les requêtes préparées
+    $query="insert into client(nom,IdProvince,num_tele) values (:nom, :id_prov, :telephone)";
+    $pdostmt=$pdo->prepare($query);
+    $result=$pdostmt->execute(["nom"=>$_POST["inputnom"], "id_prov"=>$_POST["inputville"], "telephone"=>$_POST["inputtel"]]);
+
+    if($result){
+        $response=[
+            "value"=>true,
+            "msg"=>"Ajout avec succès !",
+        ];
+    }
+    else{
+        $response=[
+            "value"=>false,
+            "msg"=>$pdostmt->errorInfo(),
+        ];
+    };
+    echo json_encode($response) ;
+   
+    $pdostmt->closeCursor();
+
 }
 ?>

@@ -3,10 +3,13 @@
 $index=true;
 include_once("header.php");
 include_once("main.php");
-$query = "SELECT c.nom, c.num_tele, c.ville, cmd.idCmd,cmd.date, art.description, art.prix_unitaire,lc.quantite FROM client AS c,commande AS cmd, article AS art, ligne_commande AS lc 
+$query = "SELECT c.nom, c.num_tele, c.IdProvince, cmd.idCmd,cmd.date, art.description, art.prix_unitaire, lc.quantite, prvc.nom_province, rgn.nom_region  FROM client AS c,commande AS cmd, article AS art, province_maroc AS prvc, region_maroc AS rgn , ligne_commande AS lc 
   WHERE c.idClient=cmd.idClient 
   AND  cmd.idCmd=lc.idCommande
-  AND art.idArticle=lc.idarticle;
+  AND art.idArticle=lc.idarticle
+  AND c.IdProvince=prvc.idProvince
+  AND prvc.code_region=rgn.code_region;
+  
 ";
 $pdostmt=$pdo->prepare($query);
 $pdostmt->execute();
@@ -22,7 +25,8 @@ $pdostmt->execute();
             <th></th>
             <th>Nom</th>
             <th>Numero Telephone</th>
-            <th>Ville</th>
+            <th>Région</th>
+            <th>Province</th>
             <th>Date</th>
             <th>DESCRIPTION</th>
             <th>PRIX UNITAIRE</th>
@@ -44,7 +48,8 @@ $pdostmt->execute();
             </td>
             <td><?php echo $ligne["nom"] ?></td>
             <td><?php echo $ligne["num_tele"] ;?></td>
-            <td><?php echo $ligne["ville"] ;?></td>
+            <td><?php echo $ligne["nom_region"] ;?></td>
+            <td><?php echo $ligne["nom_province"] ;?></td>
             <td><?php echo $ligne["date"] ;?></td>
             <td><?php echo $ligne["description"] ;?></td>
             <td><?php echo $ligne["prix_unitaire"] ;?></td>

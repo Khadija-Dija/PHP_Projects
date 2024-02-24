@@ -19,7 +19,7 @@ ob_start();
         
       $idcmd= `echo $_GET[idcmd]`;
     //   echo $idcmd;
-      $query="select * from commande,ligne_commande, client where commande.idClient=client.idClient and ligne_commande.idCommande=commande.idCmd and commande.idCmd=:id_Cmd";
+      $query="select * from commande,ligne_commande, client, province_maroc where commande.idClient=client.idClient and ligne_commande.idCommande=commande.idCmd and client.IdProvince=province_maroc.idProvince and commande.idCmd=:id_Cmd" ;
      // $query_cmd = "SELECT * FROM commande WHERE idCmd = :id_Cmd";
      // $query_ligne_cmd="SELECT * FROM ligne_commande WHERE idCommande = :id_Cmd";
     $objstmt=$pdo->prepare($query);
@@ -72,7 +72,7 @@ ob_start();
     </div>
     <div class="col-md-6">
         <label for="inputville" class="form-label">Ville</label>
-        <input type="text" class="form-control" id="inputville" name="inputville" value="<?php echo $row["ville"]?>" disabled>
+        <input type="text" class="form-control" id="inputville" name="inputville" value="<?php echo $row["nom_province"]?>" disabled>
     </div>
     <div class="col-md-6">
         <label for="inputtel" class="form-label">Telephone</label>
