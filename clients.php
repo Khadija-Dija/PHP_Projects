@@ -1,8 +1,48 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
-  $(document).ready(function(){
-  
+       function update_client(id){
+        // console.log(id);
+        $.ajax({
+            type:"GET",
+            url:'ajaxData.php?updated_client='+id,
+            //type de retour des information
+            dataType:'json',
+            success: function(response){
+                console.log(response);
+                $("#client_id").val(response.msg.idClient);
+                $("#inputnom").val(response.msg.nom);
+                $("#inputtel").val(response.msg.num_tele);
+                $("#inputregion option[value='"+response.msg.code_region+"']").prop("selected",true);
+                $("#inputville").html("<option value="+response.msg.IdProvince+">"+response.msg.nom_province+"</option>");
+                $("#clientModalLabel").html("Modifier un client");
+                $("#btn").html("Modifier");
+                $("#ClientModal").modal("show");
+                
+            }
+
+        })
+    }
+    function delete_client(id){
+        $.ajax({
+            type:"GET",
+            url:'ajaxData.php?deleted_client='+id,
+            dataType:"json",
+            success: function(response){
+                if(response.status){
+                    toastr.success(response.msg)
+                }
+                else{
+                    toastr.error(response.msg);
+                }
+            },
+            complete: function(){
+            setInterval("location.reload()",600)
+            },
+            
+        });
+    }
     // Code à exécuter lorsque le DOM est prêt
+  $(document).ready(function(){
     // Attacher un événement à l'élément #inputregion
     $("#inputregion").on("change", function(){
       var code_region = $("#inputregion").val();
@@ -107,7 +147,7 @@ $pdostmt2->execute();
     <div class="modal-dialog">
         <div class="modal-content">
         <div class="modal-header">
-            <h1 class="modal-title fs-5" > Ajouter un client</h1>
+            <h5 id="clientModalLabel" class="modal-title fs-5" > Ajouter un client</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div> 
         <form class="row g-3" method="POST" id="addclientform">
@@ -116,6 +156,7 @@ $pdostmt2->execute();
                     <div class="col-md-6">
                         <label for="inputnom" class="form-label">Nom</label>
                         <input type="text" class="form-control" id="inputnom" name="inputnom" required>
+                        <input type="hidden" name="client_id" id="client_id">
                     </div>
                     <div class="col-md-6">
                     <label for="inputtel" class="form-label">Telephone</label>
@@ -139,7 +180,7 @@ $pdostmt2->execute();
             
             </div>             
         <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Ajouter</button>            
+            <button type="submit" class="btn btn-primary" id="btn">Ajouter</button>            
         </div>
         </form>
         </div>
