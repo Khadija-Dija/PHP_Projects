@@ -1,4 +1,5 @@
 <?php 
+session_start();
   include_once("connexion.php");
   $pdo=new connect();
   $count=0;
@@ -156,4 +157,100 @@ if(!empty($_GET["deleted_client"])){
     echo json_encode($response);
     $pdostmt->closeCursor();
 }
+//register
+if(!empty($_POST["username_register"])&&!empty($_POST["email_register"])&&!empty($_POST["password_register"])&&!empty($_POST["confirm-password_register"])){
+  //  verifier si username n'existe pas dans la DB
+    $query3="select username from users where username=:name";
+    $pdostmt3=$pdo->prepare($query3);
+    $pdostmt3->execute(["name"=>$_POST["username_register"]]);
+    $username=$pdostmt3->fetch(PDO::FETCH_ASSOC);
+    if ($username) {
+        $msg = "Ce nom existe déjà.";
+        $response = [
+            "username" => $msg
+        ];
+    }else{
+       
+        // echo "le nom est".$_POST["username_register"];
+        //verifier si l'email n'existe pas dans la DB
+        $query2="select email from users where email=:mail";
+        $pdostmt2=$pdo->prepare($query2);
+        $pdostmt2->execute(["mail"=>$_POST["email_register"]]);
+        $myresult=$pdostmt2->fetch(PDO::FETCH_ASSOC);
+
+        if(!$myresult){
+            $query="insert into users(username,email,password) values (:username, :email, :pwd)";
+            $pdostmt=$pdo->prepare($query);
+            $result=$pdostmt->execute(["username"=>$_POST["username_register"], "email"=>$_POST["email_register"], "pwd"=>password_hash($_POST["password_register"],PASSWORD_DEFAULT)]);
+            $msg="Enregister avec succès!!";
+
+            if($result){
+                $response=[ 
+                    "msg"=>$msg,
+                    "value"=>true
+                ];
+               
+            }
+            else{
+                $response=[
+                    "msg"=>$pdostmt->errorInfo(),
+                    "value"=>false
+
+                ];
+               
+            }
+        }else{
+                $msg="Cet email exist dèja";
+                $response=[
+                    "email"=>$msg
+                ];
+              
+            }
+    }
+   
+    echo json_encode($response);
+    $pdostmt3->closeCursor();
+}
+//login
+if(!empty($_POST["username_login"])&&!empty($_POST["password_login"])){
+    //verifier si le username existe deja
+    $query="select * from users where username=:name";
+    $pdostmt=$pdo->prepare($query);
+    $pdostmt->execute(["name"=>$_POST["username_login"]]);
+    $user=$pdostmt->fetch(PDO::FETCH_ASSOC);
+    // var_dump($username);
+    // exit();
+    if(!$user){
+        $msg="Cet utilisateur n'exist pas";
+        $response=[ 
+            "user"=>$msg
+        ];
+    } else {
+        //verifier le mot de passe
+        $pass=password_verify($_POST["password_login"],$user["password"]);
+         
+        if(!$pass){
+        $msg="Ce password est erroné";  
+        $response = [
+            "value" => false, 
+            "msg" => $msg ,
+        
+        ];
+        }
+        else{
+            //recuperer le nom du username connecter
+            //variable de session user
+            $_SESSION["user"]= $user["username"];
+            $msg="Connexion réussite";  
+            $response = [
+                "value" => true, 
+                "msg" => $msg ,
+            
+            ];
+        }
+    }
+    echo json_encode($response);
+}
+
+
 ?>

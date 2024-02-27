@@ -92,3 +92,6 @@ foreach($pdostmt->fetchAll(PDO::FETCH_NUM) as $tabValues){
 <?php 
 include_once("footer.php");
 ?>
+<script src="codeDT.js">
+
+</script>

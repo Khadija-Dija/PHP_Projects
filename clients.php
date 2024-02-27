@@ -1,4 +1,16 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<?php 
+$client=true;
+ob_start();
+include_once("header.php");
+include_once("main.php");
+
+$query2="SELECT * from region_maroc ORDER BY nom_region ASC";
+$pdostmt2=$pdo->prepare($query2); 
+$pdostmt2->execute();
+
+?>
+
 <script>
        function update_client(id){
         // console.log(id);
@@ -120,18 +132,7 @@
     getClient();
   })
 </script>
-<?php 
 
-$client=true;
-ob_start();
-include_once("header.php");
-include_once("main.php");
-
-$query2="SELECT * from region_maroc ORDER BY nom_region ASC";
-$pdostmt2=$pdo->prepare($query2); 
-$pdostmt2->execute();
-
-?>
 
     <h1 class="mt-5">Clients</h1>
     <button type="button" class="btn btn-primary"  style="float:right; margin-bottom:20px;" data-bs-toggle="modal" data-bs-target="#ClientModal" data-bs-whatever="@mdo">

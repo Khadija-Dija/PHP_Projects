@@ -68,3 +68,6 @@ $pdostmt->execute();
 $pdostmt->closeCursor();
 include_once("footer.php");
 ?>
+<script src="codeDT.js">
+
+</script>
