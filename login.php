@@ -1,3 +1,12 @@
+<?php 
+//random_bytes(16) génère une chaîne d'octets aléatoires de longueur 16
+//bin2hex convertit les données binaires en une représentation hexadécimale. 
+  $token=bin2hex(random_bytes(16));
+  var_dump($token);
+
+  
+?>
+
 <!doctype html>
 <html lang="en" class="h-100" data-bs-theme="auto">
   <head>
@@ -124,6 +133,17 @@
             $("#register-form").delay(100).fadeIn(100);
             $("#login-form").fadeOut(100);
             $('#login-form-link').removeClass('active');
+            $("#password-forgot-form").fadeOut(100);
+            $('#password-forgot-form-link').removeClass('active');
+            $('#password-forgot-form-link').css("display","none");
+            $("#login-form-link").css("display","block");
+            $(this).addClass('active');
+            e.preventDefault();
+        });
+        $('#password-forgot-form-link').click(function(e) {
+            $("#password-forgot-form").delay(100).fadeIn(100);
+            $("#login-form").fadeOut(100);
+            $('#register-form-link').removeClass('active');
             $(this).addClass('active');
             e.preventDefault();
         });
@@ -150,49 +170,61 @@
             $("#checkpass").html("Les mots de passe identiques !");
         }
     }
-    $(document).ready(function(){
-    $("form#register-form").submit(function(ev) {
-    ev.preventDefault();
-    $.ajax({
-      type: 'POST',
-      url: 'ajaxData.php',
-      data: $("#register-form").serialize(),
-      dataType: 'json',
-      success: function(response) {
-        if (response.username) {
-          console.log(response);
 
-          $("#checkusername").addClass("alert alert-danger");
-          $("#checkusername").html(response.username);
-        } else {
-          if (response.email) {
+    $(document).ready(function(){
+
+        $("#forgot").click(function(e){
+            e.preventDefault();
+            $("#login-form").css("display","none");
+            $("#password-forgot-form").css("display","block");
+            $("#password-forgot-form-link").addClass("active");
+            $("#password-forgot-form-link").css("display","block");
+            $("#login-form-link").removeClass("active");
+            $("#login-form-link").css("display","none");
+
+        });
+        $("form-register-form").submit(function(ev) {
+        ev.preventDefault();
+        $.ajax({
+        type: 'POST',
+        url: 'ajaxData.php',
+        data: $("#register-form").serialize(),
+        dataType: 'json',
+        success: function(response) {
+            if (response.username) {
             console.log(response);
-            $("#checkusername").removeClass();
-            $("#checkusername").empty();
-            $("#checkemail").addClass("alert alert-danger");
-            $("#checkemail").html(response.email);
-          } else {
-            $("#checkusername").removeClass();
-            $("#checkusername").empty();
-            $("#checkemail").removeClass();
-            $("#checkemail").empty();
-            if (response.value) {
-              console.log("register avec succes");
-              toastr.success(response.msg);
-              $("#register-form")[0].reset();
-              $("#register-form-link").removeClass("active");
-              $("#checkpass").removeClass();
-              $("#checkpass").empty();
-              $("#login-form-link").addClass("active");
-              $("#login-form").css("display", "block");
-              $("#register-form").css("display", "none");
+
+            $("#checkusername").addClass("alert alert-danger");
+            $("#checkusername").html(response.username);
             } else {
-              toastr.error(response.msg);
+            if (response.email) {
+                console.log(response);
+                $("#checkusername").removeClass();
+                $("#checkusername").empty();
+                $("#checkemail").addClass("alert alert-danger");
+                $("#checkemail").html(response.email);
+            } else {
+                $("#checkusername").removeClass();
+                $("#checkusername").empty();
+                $("#checkemail").removeClass();
+                $("#checkemail").empty();
+                if (response.value) {
+                console.log("register avec succes");
+                toastr.success(response.msg);
+                $("#register-form")[0].reset();
+                $("#register-form-link").removeClass("active");
+                $("#checkpass").removeClass();
+                $("#checkpass").empty();
+                $("#login-form-link").addClass("active");
+                $("#login-form").css("display", "block");
+                $("#register-form").css("display", "none");
+                } else {
+                toastr.error(response.msg);
+                }
             }
-          }
+            }
         }
-      }
-    });
+        });
   });
         // Déclencher la méthode checkpassword
         $("#confirm-password_register").keyup(checkpassword);
@@ -226,7 +258,35 @@
             }
             })
 
-        })
+        });
+        //mot de passe oublie
+        $("#password-forgot-form").submit(function(e){
+            e.preventDefault();
+            $.ajax({
+            type: 'POST',
+            url: 'ajaxData.php',
+            data: $("#password-forgot-form").serialize(),
+            dataType: 'json',
+            success: function(response) {
+                if(!response.value){
+                    $("#checkemail").addClass("alert alert-danger");
+                    $("#checkemail").html(response.msg);
+                  
+                }
+                else{
+                    $("#checkemail").removeClass();
+                    $("#checkemail").empty();
+                    // console.log(response.token);
+                    
+
+                    // window.location="resetpwd.php";
+                }
+            }
+            })
+
+        });
+  
+            
  });
 </script>
 
@@ -241,10 +301,11 @@
                         <div class="panel-heading">
                             <div class="row">
                                 <div class="col-xs-6">
-                                    <a href="#" class="active" id="login-form-link">Login</a>
+                                    <a href="#" class="active" id="login-form-link">Se connecter</a>
+                                    <a href="#" id="password-forgot-form-link"style="display: none;">Mot de passe oublié</a>
                                 </div>
                                 <div class="col-xs-6">
-                                    <a href="#"  id="register-form-link">Register</a>
+                                    <a href="#"  id="register-form-link">Créer un compte</a>
                                 </div>
                             </div>
                             <hr>
@@ -276,13 +337,35 @@
                                             <div class="row">
                                                 <div class="col-lg-12">
                                                     <div class="text-center">
-                                                        <a href="https://phpoll.com/recover" tabindex="5" class="forgot-password">Forgot Password?</a>
+                                                        <a href="" id="forgot" tabindex="5" class="forgot-password">Mot de passe oublié?</a>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </form>
-                                    <form id="register-form" action="https://phpoll.com/register/process" method="post" role="form" style="display: none;">
+                                    <form id="password-forgot-form" action="" method="post" role="form" style="display: none;">
+                                        <div class="form-group">
+                                            <input type="email" name="email_pwd_forgot" id="email_pwd_forgot" tabindex="1" class="form-control" placeholder="Email" required>
+                                        </div>
+                                        <div id="checkemail"></div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-sm-6 col-sm-offset-3">
+                                                    <input type="submit" name="password_forgot_submit" id="password_forgot_submit" tabindex="4" class="form-control btn btn-register" value="Submit" >
+                                                </div>
+                                            </div> 
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="text-center">
+                                                        <a href=""  tabindex="5" class="forgot-password">Se connecter</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <form id="register-form" action="" method="post" role="form" style="display: none;">
                                         <div class="form-group">
                                             <input type="text" name="username_register" id="username_register" tabindex="1" class="form-control" placeholder="Nom" required>
                                         </div>

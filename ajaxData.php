@@ -251,6 +251,41 @@ if(!empty($_POST["username_login"])&&!empty($_POST["password_login"])){
     }
     echo json_encode($response);
 }
+//mot de passe oublié
+if(!empty($_POST["email_pwd_forgot"])){
+    $query="select * from users where email=:mail";
+    $pdostmt=$pdo->prepare($query);
+    $pdostmt->execute(["mail"=>$_POST["email_pwd_forgot"]]);
+    $user=$pdostmt->fetch(PDO::FETCH_ASSOC);
+    // var_dump($user);
+    if(!$user){
+        $msg="Cet email n'exist pas";
+        $response=[ 
+            "value"=>false,
+            "msg"=>$msg,
+        ];
+        
+    } else {
+        //recuperer l'id de user
+        $user_id=$user["idUser"];
+        ////recuperer l'email de user
+        $user_email=$user["email"];
+        //générer un token
+        $token=bin2hex(random_bytes(16));
+        //insertion des données  dans la table password_reset_request
+        $query="insert into password_reset_request(user_id,date_request,token) values(:id_user,:date_req,:token)";
+        $pdostmt=$pdo->prepare($query);
+        $pdostmt->execute(["id_user"=>$user_id,"date_req"=>date("Y-m-d H:i:s"),"token"=>$token]);
 
+        $msg="Redirection vert reset pasword";
+        $response=[ 
+            "value"=>true,
+            "user"=>$msg,
+            "token"=>$token,
+        ];
+      
+    }
+    echo json_encode($response);
+}
 
 ?>
