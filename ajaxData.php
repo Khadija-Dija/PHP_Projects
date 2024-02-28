@@ -1,6 +1,9 @@
+
 <?php 
 session_start();
   include_once("connexion.php");
+  include_once("mailer.php");
+
   $pdo=new connect();
   $count=0;
   $listId=[];
@@ -187,7 +190,8 @@ if(!empty($_POST["username_register"])&&!empty($_POST["email_register"])&&!empty
             if($result){
                 $response=[ 
                     "msg"=>$msg,
-                    "value"=>true
+                    "value"=>true,
+                   
                 ];
                
             }
@@ -199,6 +203,7 @@ if(!empty($_POST["username_register"])&&!empty($_POST["email_register"])&&!empty
                 ];
                
             }
+
         }else{
                 $msg="Cet email exist dèja";
                 $response=[
@@ -206,6 +211,7 @@ if(!empty($_POST["username_register"])&&!empty($_POST["email_register"])&&!empty
                 ];
               
             }
+
     }
    
     echo json_encode($response);
@@ -276,16 +282,51 @@ if(!empty($_POST["email_pwd_forgot"])){
         $query="insert into password_reset_request(user_id,date_request,token) values(:id_user,:date_req,:token)";
         $pdostmt=$pdo->prepare($query);
         $pdostmt->execute(["id_user"=>$user_id,"date_req"=>date("Y-m-d H:i:s"),"token"=>$token]);
-
-        $msg="Redirection vert reset pasword";
+        $status=forgot_pasword_reset($user_email,$token);
+        $msg="Un Email vous a été envoyer";
         $response=[ 
             "value"=>true,
-            "user"=>$msg,
+            "msg"=>$msg,
             "token"=>$token,
         ];
       
     }
     echo json_encode($response);
 }
+//changer le mot de passe 
+if(!empty($_POST["new_password"])&&!empty($_POST["confirm_new_password"])){
+    //recuperer le user 
+    $token=$_POST["user_token"];
+    $email=$_POST["user_mail"];
 
+    $query="SELECT * from users as us, password_reset_request as prr where us.idUser=prr.user_id 
+        and us.email=:mail
+        and prr.token=:token";
+    $stmt=$pdo->prepare($query);
+    $stmt->execute(["mail"=>$email,"token"=>$token]);
+    $user_info=$stmt->fetch(PDO::FETCH_ASSOC);
+//     var_dump($user_info);
+// //   exit();
+    //modifier le mot de passe 
+    if($user_info){
+        $id_user=$user_info["idUser"];
+        $query2="update users set password=:pwd where idUser=:id ";
+        $stmt2=$pdo->prepare($query2);
+        $stmt2->execute(["pwd"=>password_hash($_POST["new_password"],PASSWORD_DEFAULT),"id"=>$id_user]);
+        $msg="Mot de passe changer avec success";
+        $response=[ 
+            "value"=>true,
+            "msg"=>$msg,
+        ];
+        
+    }else{
+        $msg="Ces infos ne correspondent à aucun user !! ";
+        $response=[ 
+            "value"=>false,
+            "msg"=>$msg,
+        ];
+    }
+    echo json_encode($response);
+}
+// echo json_encode($response);
 ?>

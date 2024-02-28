@@ -2,7 +2,7 @@
 //random_bytes(16) génère une chaîne d'octets aléatoires de longueur 16
 //bin2hex convertit les données binaires en une représentation hexadécimale. 
   $token=bin2hex(random_bytes(16));
-  var_dump($token);
+//   var_dump($token);
 
   
 ?>
@@ -153,8 +153,8 @@
     </script>
   <script>
     function checkpassword(){
-        let pwd = $("#password_register").val();
-        let confirm_pwd = $("#confirm-password_register").val();
+        let pwd = $("#password").val();
+        let confirm_pwd = $("#confirm_password").val();
         if(pwd != confirm_pwd){
             // Supprimer toutes les classes d'alerte précédentes
             $("#checkpass").removeClass("alert-danger alert-success");
@@ -183,7 +183,7 @@
             $("#login-form-link").css("display","none");
 
         });
-        $("form-register-form").submit(function(ev) {
+        $("#register-form").submit(function(ev) {
         ev.preventDefault();
         $.ajax({
         type: 'POST',
@@ -193,7 +193,6 @@
         success: function(response) {
             if (response.username) {
             console.log(response);
-
             $("#checkusername").addClass("alert alert-danger");
             $("#checkusername").html(response.username);
             } else {
@@ -203,6 +202,8 @@
                 $("#checkusername").empty();
                 $("#checkemail").addClass("alert alert-danger");
                 $("#checkemail").html(response.email);
+                console.log("Une erreur");
+                console.log(response.value);
             } else {
                 $("#checkusername").removeClass();
                 $("#checkusername").empty();
@@ -227,7 +228,7 @@
         });
   });
         // Déclencher la méthode checkpassword
-        $("#confirm-password_register").keyup(checkpassword);
+        $("#confirm_password").keyup(checkpassword);
         $("#login-form").submit(function(e){
             e.preventDefault();
             $.ajax({
@@ -271,30 +272,103 @@
                 if(!response.value){
                     $("#checkemail").addClass("alert alert-danger");
                     $("#checkemail").html(response.msg);
-                  
+                    // $("#password-forgot-form")[0].reset();
                 }
                 else{
                     $("#checkemail").removeClass();
                     $("#checkemail").empty();
-                    // console.log(response.token);
-                    
+                    toastr.success(response.msg);
+                    // $("#password-forgot-form")[0].reset();
 
-                    // window.location="resetpwd.php";
                 }
             }
             })
 
         });
-  
+       //changer le mot de passe change-pwd-form
+       $("#change-pwd-form").submit(function(e){
+            e.preventDefault();
+            $.ajax({
+            type: 'POST',
+            url: 'ajaxData.php',
+            data: $("#change-pwd-form").serialize(),
+            dataType: 'json',
+            success: function(response) {
+                // console.log(response.msg);
+              if(!response.value){
+
+                $("#checkuser").addClass("alert alert-danger");
+                $("#checkuser").html(response.msg);
+              }
+              else{
+
+                console.log(response.msg);
+                window.location="login.php";
+              }
+            }
+            })
+
+        });
             
  });
 </script>
 
     </head>
     <body>
+    <?php 
+    //verifer si les variable email et token existe dans la requete
+    $email=!empty($_GET["email"])?trim($_GET["email"]):"";
+    $token=!empty($_GET["token"])?trim($_GET["token"]):"";
+  
 
+    ?>
     <!------ Include the above in your HEAD tag ---------->
     <div class="container">
+       <?php if($email && $token){?>
+   
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3">
+                        <div class="panel panel-login">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <a href="#" class="active" id="change-pwd-form-link">Changer le mot de passe</a>
+                                    </div>
+                                </div>
+                                <hr>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <form id="change-pwd-form" action="" method="post" role="form">
+                                            <div id="checkuser"></div>
+                                            <div class="form-group">
+                                               
+                                                <input type="text" name="user_token" value=<?php echo $token?>>
+                                                <input type="text" name="user_mail" value=<?php echo $email?>>
+                                                <input type="password" name="new_password" id="password" tabindex="2" class="form-control" placeholder="Nouveau mot de passe" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="password" name="confirm_new_password" id="confirm_password" tabindex="2" class="form-control" placeholder="Confirmer mot de passe" required>
+                                            </div>
+                                            <div id="checkpass">
+                                            </div> 
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-sm-6 col-sm-offset-3">
+                                                        <input type="submit" name="change-pwd-submit" id="change-pwd-submit" tabindex="4" class="form-control btn btn-register" value="Submit">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        
+        <?php }else{?>
             <div class="row">
                 <div class="col-md-6 col-md-offset-3">
                     <div class="panel panel-login">
@@ -375,11 +449,11 @@
                                         </div>
                                         <div id="checkemail"></div>
                                         <div class="form-group">
-                                            <input type="password" name="password_register" id="password_register" tabindex="2" class="form-control" placeholder="Mot de passe" required>
+                                            <input type="password" name="password_register" id="password" tabindex="2" class="form-control" placeholder="Mot de passe" required>
                                         </div>
                      
                                         <div class="form-group">
-                                            <input type="password" name="confirm-password_register" id="confirm-password_register" tabindex="2" class="form-control" placeholder="Confirmer mot de passe" required>
+                                            <input type="password" name="confirm-password_register" id="confirm_password" tabindex="2" class="form-control" placeholder="Confirmer mot de passe" required>
                                         </div>
                                         <div id="checkpass">
                                         </div> 
@@ -397,7 +471,8 @@
                     </div>
                 </div>
             </div>
-        </div>
+        <?php }?>
+    </div>
         <script src=" https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" ></script>
     </body>
 </html>
