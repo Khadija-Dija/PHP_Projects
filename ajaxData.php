@@ -29,54 +29,67 @@ if(!empty($_POST["code_region"])){
     endwhile;
     $pdostmt->closeCursor();
 };
-//verifier si les champs non null
+//Ajouter un client
 if(!empty($_POST["inputnom"])&&!empty($_POST["inputville"])&&!empty($_POST["inputtel"])){
-   
-        if(empty($_POST["client_id"])){
-        // prévenir les attaques par injection SQL: on utilise les paramètres nommés(nom,ville,telephone) dans les requêtes préparées
-        $query="insert into client(nom,IdProvince,num_tele) values (:nom, :id_prov, :telephone)";
-        $pdostmt=$pdo->prepare($query);
-        $result=$pdostmt->execute(["nom"=>$_POST["inputnom"], "id_prov"=>$_POST["inputville"], "telephone"=>$_POST["inputtel"]]);
-        $msg="Ajouter avec succès !!";
 
-        if($result){
+        $pattern="#^(0)[1-6]([0-9]{2}){4}$#";
+        $subject=$_POST["inputtel"];
+        $retour=preg_match($pattern,$subject);
+        if($retour){
+            //si le client id n'exist pas on va faire un ajout
+            if(empty($_POST["client_id"])){
+                // prévenir les attaques par injection SQL: on utilise les paramètres nommés(nom,ville,telephone) dans les requêtes préparées
+                $query="insert into client(nom,IdProvince,num_tele) values (:nom, :id_prov, :telephone)";
+                $pdostmt=$pdo->prepare($query);
+                $result=$pdostmt->execute(["nom"=>$_POST["inputnom"], "id_prov"=>$_POST["inputville"], "telephone"=>$_POST["inputtel"]]);
+                $msg="Ajouter avec succès !!";
+        
+                if($result){
+                    $response=[
+                        "value"=>true,
+                        "msg"=>$msg,
+                    ];
+                }
+                else{
+                    $response=[
+                        "value"=>false,
+                        "msg"=>$pdostmt->errorInfo(),
+                    ];
+                };
+            }
+            //si le client id exist on va faire un update
+            else{
+                $query="update client set nom=:nom, IdProvince=:province, num_tele=:tel  where idClient=:id";
+                $pdostmt=$pdo->prepare($query);
+                $result=$pdostmt->execute(["nom"=>$_POST["inputnom"], "province"=>$_POST["inputville"], "tel"=>$_POST["inputtel"],"id"=>$_POST["client_id"]]);
+                $msg="Modifier avec succès !!";
+        
+                if($result){
+                    $response=[
+                        "value"=>true,
+                        "msg"=>$msg,
+                    ];
+                }
+                else{
+                    $response=[
+                        "value"=>false,
+                        "msg"=>$pdostmt->errorInfo(),
+                    ];
+                }
+        
+            }
+        }
+        else{
+            $msg="Numéro de téléphone invalide";
             $response=[
-                "value"=>true,
+                "value"=>false,
                 "msg"=>$msg,
             ];
         }
-        else{
-            $response=[
-                "value"=>false,
-                "msg"=>$pdostmt->errorInfo(),
-            ];
-        };
-    }
-    //si le client id n'exist pas on va faire un update
-    else{
-        $query="update client set nom=:nom, IdProvince=:province, num_tele=:tel  where idClient=:id";
-        $pdostmt=$pdo->prepare($query);
-        $result=$pdostmt->execute(["nom"=>$_POST["inputnom"], "province"=>$_POST["inputville"], "tel"=>$_POST["inputtel"],"id"=>$_POST["client_id"]]);
-        $msg="Modifier avec succès !!";
-
-        if($result){
-            $response=[
-                "value"=>true,
-                "msg"=>$msg,
-            ];
-        }
-        else{
-            $response=[
-                "value"=>false,
-                "msg"=>$pdostmt->errorInfo(),
-            ];
-        };
-
-    }
 
     echo json_encode($response) ;
-    $pdostmt->closeCursor();
 }
+//afficher les client
 if(!empty($_GET["clients"])){
    
     $query="SELECT * from client AS C , region_maroc AS R, province_maroc AS P WHERE
@@ -138,6 +151,7 @@ if(!empty($_GET["updated_client"])){
     echo json_encode($response);
 
 }
+//delete client
 if(!empty($_GET["deleted_client"])){
     
     $query="delete from client where idClient=:id";
@@ -328,5 +342,5 @@ if(!empty($_POST["new_password"])&&!empty($_POST["confirm_new_password"])){
     }
     echo json_encode($response);
 }
-// echo json_encode($response);
+
 ?>

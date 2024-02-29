@@ -12,6 +12,7 @@ $pdostmt2->execute();
 ?>
 
 <script>
+      //update client
        function update_client(id){
         // console.log(id);
         $.ajax({
@@ -34,6 +35,7 @@ $pdostmt2->execute();
 
         })
     }
+    //delete client
     function delete_client(id){
         $.ajax({
             type:"GET",
@@ -90,7 +92,7 @@ $pdostmt2->execute();
           if (response.value) {
             // console.log(response);
             toastr.success(response.msg); // Afficher une notification de succès
-            console.log(response.msg);
+            // console.log(response.msg);
             $('#ClientModal').modal('hide'); // Fermer le modal Bootstrap
             $('#addclientform')[0].reset(); //vider le formulaire
             $('#inputville').val(''); //vider la case province
@@ -104,7 +106,7 @@ $pdostmt2->execute();
         },
         error: function(xhr, status, error) {
             console.log(error);
-        console.log(xhr.responseText); // Afficher les détails de l'erreur dans la console
+        // console.log(xhr.responseText); // Afficher les détails de l'erreur dans la console
         }
       })
     });
@@ -119,21 +121,27 @@ $pdostmt2->execute();
                 $("#clients").html(response);
                 // console.log(response);
                 $("#datatable").dataTable({
-                "oLanguage": {
-                "sLengthMenu": "Afficher MENU Enregistrements",
-                "sSearch": "Rechercher:",
-                "sInfo":"Total de TOTAL enregistrements (_END_ / _TOTAL_)",
-                "oPaginate": {
-                "sNext": "Suivant",
-                "sPrevious":"Précédent"}}})
+              oLanguage: {
+                sLengthMenu: "Afficher _MENU_ enregistrements",
+                sSearch: "Recherche",
+                sInfo: "Total d'enregistrements (_END_ / _TOTAL_)",
+                oPaginate: {
+                  sNext: "Suivant",
+                  sPrevious: "Précédent",
+                },
+              },
+              lengthMenu: [
+                [10, 25, 50, -1],
+                [10, 25, 50, "Tous"],
+              ], // Spécifie les options de longueur du menu
+              pageLength: 5, // Spécifie le nombre de lignes par page par défaut
+            });
             }
         })
     };
     getClient();
   })
 </script>
-
-
     <h1 class="mt-5">Clients</h1>
     <button type="button" class="btn btn-primary"  style="float:right; margin-bottom:20px;" data-bs-toggle="modal" data-bs-target="#ClientModal" data-bs-whatever="@mdo">
         <!-- <a href="addClient.php" class="btn btn-primary mb-4"> -->
@@ -180,9 +188,9 @@ $pdostmt2->execute();
                     </div>
             
             </div>             
-        <div class="modal-footer">
-            <button type="submit" class="btn btn-primary" id="btn">Ajouter</button>            
-        </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" id="btn">Ajouter</button>            
+            </div>
         </form>
         </div>
     </div>

@@ -109,7 +109,7 @@
 	height: auto;
 	font-weight: normal;
 	padding: 14px 0;
-	text-transform: uppercase;
+	/* text-transform: uppercase; */
 	border-color: #1CB94A;
 }
 .btn-register:hover,
@@ -253,7 +253,7 @@
                     else{
 
                         //redirection si le mot de passe est valide
-                        window.location="index.php";
+                        window.location="home.php";
                     }
                 }
             }
@@ -344,8 +344,8 @@
                                             <div id="checkuser"></div>
                                             <div class="form-group">
                                                
-                                                <input type="text" name="user_token" value=<?php echo $token?>>
-                                                <input type="text" name="user_mail" value=<?php echo $email?>>
+                                                <!-- <input type="text" name="user_token" value=<?php echo $token?>>
+                                                <input type="text" name="user_mail" value=<?php echo $email?>> -->
                                                 <input type="password" name="new_password" id="password" tabindex="2" class="form-control" placeholder="Nouveau mot de passe" required>
                                             </div>
                                             <div class="form-group">

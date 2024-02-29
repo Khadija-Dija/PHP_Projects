@@ -20,11 +20,7 @@ foreach($pdostmt->fetchAll(PDO::FETCH_NUM) as $tabValues){
     }
 
 };
-// var_dump($listId);
-
 ?>
-
-<!-- Begin page content -->
 
     <h1 class="mt-5">Articles</h1>
     <a href="addArticle.php" class="btn btn-primary mb-4" style="float:right">
@@ -37,7 +33,7 @@ foreach($pdostmt->fetchAll(PDO::FETCH_NUM) as $tabValues){
     $query="select * from article";
     $pdostmt=$pdo->prepare($query);
     $pdostmt->execute();
-  //  var_dump($pdostmt->fetchAll(PDO::FETCH_ASSOC));
+
 ?>
     <table id="datatable" class="display">
     <thead>

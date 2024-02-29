@@ -17,9 +17,8 @@ $pdostmt->execute();
 
 <!-- Begin page content -->
 
-    <h1 class="mt-5">Acceuil</h1>
-
-    <table id="datatable" class="display">
+    <h1 class="mt-5 mb-5">Acceuil</h1>
+    <table id="datatable" class="display ">
     <thead>
         <tr>
             <th></th>
